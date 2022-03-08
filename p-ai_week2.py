@@ -31,10 +31,10 @@ def reqMatchData(matchId):
   return r.json()
 
 
-# Iterating through the list of matches and pulling data on matches
 
-# Pulling number of blueAssists and redAssists
-header = ['matchNum', 'blueKills', 'redKills','blueAssists', 'redAssists', 'BlueGold','redGold', 'gameLength', 'OUTCOME']
+# creating CSV header (column names)
+
+header = ['matchNum', 'blueKills', 'redKills','blueAssists', 'redAssists', 'blueGold','redGold', 'gameLength', 'OUTCOME']
 
 with open('league_dataset.csv', 'w', encoding='UTF8', newline='') as f:
   writer = csv.writer(f)
@@ -42,9 +42,10 @@ with open('league_dataset.csv', 'w', encoding='UTF8', newline='') as f:
   # write the header
   writer.writerow(header)
 
-  # write the data
-
   matchnum=1
+
+  # iterating through the list of matches and pulling data on matches
+
   for matchid in LastFiftyMatches:
     #print("matchid=", matchid)
     #print("match data=",  reqMatchData(matchid))
@@ -63,10 +64,10 @@ with open('league_dataset.csv', 'w', encoding='UTF8', newline='') as f:
     blueKills=0
     redKills=0
 
-    while i<num_participants/2:
-      blueAssists+=matchinfo['info']['participants'][i]['assists']
-      blueGold+=matchinfo['info']['participants'][i]['goldEarned']
-      blueKills+=matchinfo['info']['participants'][i]['kills']
+    while i<num_participants/2: # because not all games has the same number of participants - first half are blue team
+      blueAssists+=matchinfo['info']['participants'][i]['assists'] # total number of assists by blue team
+      blueGold+=matchinfo['info']['participants'][i]['goldEarned'] # total number of gold
+      blueKills+=matchinfo['info']['participants'][i]['kills'] # total number of kills
       i+=1
 
     while i>=num_participants/2 and i<num_participants:
@@ -75,12 +76,12 @@ with open('league_dataset.csv', 'w', encoding='UTF8', newline='') as f:
       redKills+=matchinfo['info']['participants'][i]['kills']
       i+=1
 
-    if matchinfo['info']['participants'][0]['win'] == True:
-      outcome=1
+    if matchinfo['info']['participants'][0]['win'] == True: # if first player wins, then blue team won that match
+      outcome=1 # 1 means blue team win
     else:
-      outcome=0
+      outcome=0 # 0 means red team win
 
-    gamelength=matchinfo['info']['gameDuration']
+    gamelength=matchinfo['info']['gameDuration'] # finding length of game
 
     print("Total blueKills in Match", matchnum, "=", blueKills)
     print("Total redKills in Match", matchnum, "=", redKills)
@@ -95,13 +96,15 @@ with open('league_dataset.csv', 'w', encoding='UTF8', newline='') as f:
     print("Game Duration in Match", matchnum, "=",   gamelength)
     print("Outcome in Match", matchnum, "=",   outcome)
 
-    data=[]
-    data+=[matchnum, blueKills, redKills, blueAssists, redAssists, blueGold, redGold, gamelength, outcome]
+    data=[matchnum, blueKills, redKills, blueAssists, redAssists, blueGold, redGold, gamelength, outcome] # indicating what to write as data
     # print("data=", data)
 
-    matchnum+=1
-    writer.writerow(data)
+    matchnum+=1 # iterating through next match
+    writer.writerow(data) # writing data into CSV
 
     time.sleep(1)
+
+
+
 
 
